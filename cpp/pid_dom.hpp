@@ -31,6 +31,7 @@
 #define PID_DOM_HPP
 
 #include <iostream>
+#include <cmath>
 
 class PID_DOM
 {
@@ -80,6 +81,10 @@ public:
 
         // Update old values for next iteration
         prev_meas_ = measurement;
+
+        if (std::fabs(output_) < 1e-6) {
+            output_ = 0.0f;
+        }
 
         return output_;
     }
