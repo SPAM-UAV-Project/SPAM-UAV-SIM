@@ -1,4 +1,4 @@
-T = readtable("y_force_resp_step.csv");
+T = readtable("f_y_response.csv");
 
 head(T)
 
@@ -19,7 +19,7 @@ plot(t, y, 'Color', [0.7 0.7 0.7]);
 hold on;
 plot(t, y_filt, 'LineWidth', 2);
 legend('Raw Sensor Data', 'filtfilt (1st order)');
-xlabel('Time (s)'); ylabel('Position');
+xlabel('Time (s)'); ylabel('Force_y');
 % end filter
 
 t_ms = T.time_ms;
@@ -32,5 +32,16 @@ y_norm = (1 * (syse.OutputData - min(syse.OutputData)) / (max(syse.OutputData) -
 
 sysee = iddata(y_norm, u_norm, Ts);
 
+v = sysv1;
+u_norm_v1 = (2 * (v.InputData - min(v.InputData)) / (max(v.InputData) - min(v.InputData))) - 1;
+y_norm_v1 = (2 * (v.OutputData - min(v.OutputData)) / (max(v.OutputData) - min(v.OutputData))) - 1;
+sysvv1 = iddata(y_norm_v1, u_norm_v1, Ts);
+
+v = sysv2;
+u_norm_v2 = (1 * (v.InputData - min(v.InputData)) / (max(v.InputData) - min(v.InputData)));
+y_norm_v2 = (1 * (v.OutputData - min(v.OutputData)) / (max(v.OutputData) - min(v.OutputData)));
+sysvv2 = iddata(y_norm_v2, u_norm_v2, Ts);
+
 %% save tf
-save('f_xy_tf.mat', 'tf1');
+tf_force_y = tf14;
+save('f_xy_tf.mat', 'tf_force_y');

@@ -20,7 +20,8 @@ mav_inertia = eye(3) * 0.003;
 mav_inertia(3, 3) = 0.0003;
 mav_mass = 0.6; %kg
 top_motor_arm = [0, 0, 0.1]; % m from center of mass
-f_xy_tf = load("f_xy_tf.mat").tf1;
+f_xy_tf = load("f_xy_tf.mat").tf_force_y;
+thrust_tf = load("thrust_tf.mat").tf_thrust;
 
 % controller vars
 att_ctrl_time = 1/250; % 4 ms

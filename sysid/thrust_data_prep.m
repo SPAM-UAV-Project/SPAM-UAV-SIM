@@ -1,4 +1,4 @@
-T = readtable("thrust_resp_step.csv");
+T = readtable("thrust_response.csv");
 
 head(T)
 
@@ -8,12 +8,39 @@ t_ms = T.time_ms;
 
 Ts = (t_ms(2) - t_ms(1)) / 1000;
 
-% normalize thrust setpoint and values between 0 and 1
-u_norm = (u - min(u)) / (max(u) - min(u));
-y_norm = (y - min(y)) / (max(y) - min(y));
+% filter y
+fs = 10;                % Sampling frequency (Hz)
+fc = 0.3;                 % Cutoff frequency (Hz) - Starting point
+nyquist = fs / 2;       % Nyquist frequency (5 Hz)
+Wn = fc / nyquist; 
 
-u_norm = filtfilt(u_norm);
-y_norm = filtfilt(y_norm);
+[b, a] = butter(1, Wn, 'low');
+y_filt = filtfilt(b, a, y);
 
-sys = iddata(y_norm, u_norm, Ts);
-systemIdentification;
+t = (0:length(y)-1) / fs;
+plot(t, y, 'Color', [0.7 0.7 0.7]); 
+hold on;
+plot(t, y_filt, 'LineWidth', 2);
+legend('Raw Sensor Data', 'filtfilt (1st order)');
+xlabel('Time (s)'); ylabel('Thrust');
+
+sys = iddata(y_filt, u_norm, Ts);
+
+%% get sys e object and then normalize so the TF always reaches desired values
+est = syse;
+
+u_norm = (1 * (est.InputData - min(est.InputData)) / (max(est.InputData) - min(est.InputData)));
+y_norm = (1 * (est.OutputData - min(est.OutputData)) / (max(est.OutputData) - min(est.OutputData)));
+
+sysee = iddata(y_norm, u_norm, Ts);
+
+est = sysv;
+
+u_norm = (1 * (est.InputData - min(est.InputData)) / (max(est.InputData) - min(est.InputData)));
+y_norm = (1 * (est.OutputData - min(est.OutputData)) / (max(est.OutputData) - min(est.OutputData)));
+
+sysvv = iddata(y_norm, u_norm, Ts);
+
+%% save
+thrust_tf = tf16;
+save("thrust_tf.mat", "thrust_tf");
