@@ -3,7 +3,7 @@ T = readtable("thrust_response.csv");
 head(T)
 
 u = T.thrust_sp;
-y = -T.thrust;
+y = T.torque_z;
 t_ms = T.time_ms;
 
 Ts = (t_ms(3) - t_ms(2)) / 1000
@@ -42,5 +42,5 @@ y_norm = (1 * (est.OutputData - min(est.OutputData)) / (max(est.OutputData) - mi
 sysvv = iddata(y_norm, u_norm, Ts);
 
 %% save
-thrust_tf = tf4;
+thrust_tf = tf16;
 save("thrust_tf.mat", "thrust_tf");
