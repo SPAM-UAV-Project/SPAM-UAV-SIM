@@ -109,7 +109,7 @@ private:
     void setKp(float Kp) { this->kp_ = Kp; }  // for compatibility with other PID libraries
     void setKi(float Ki) { this->ki_Ts_ = Ki * Ts_; }  // premultiply by Ts for efficiency
     void setKd(float Kd) { this->kd_Ts_ = Kd / Ts_; }  // predivide by Ts for efficiency
-    void setIntegClamp(float integ_clamp) { this->integ_clamp_ = (k_ * ki_Ts_ > 1e-6) ? integ_clamp / (k_ * ki_Ts_) : 0.0f; }
+    void setIntegClamp(float integ_clamp) { this->integ_clamp_ = (k_ * ki_Ts_ > 1e-9) ? integ_clamp / (k_ * ki_Ts_) : 0.0f; }
 };
 
 #endif

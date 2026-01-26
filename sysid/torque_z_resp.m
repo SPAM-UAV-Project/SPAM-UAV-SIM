@@ -3,14 +3,14 @@ T = readtable("thrust_response.csv");
 head(T)
 
 u = T.thrust_sp;
-y = T.torque_z;
+y = T.torque_z * 0.13;
 t_ms = T.time_ms;
 
-Ts = (t_ms(3) - t_ms(2)) / 1000
+Ts = (t_ms(3) - t_ms(2)) / 1000;
 
 % filter y
-fs = 10;                % Sampling frequency (Hz)
-fc = 0.3;                 % Cutoff frequency (Hz) - Starting point
+fs = 100;                % Sampling frequency (Hz)
+fc = 4;                 % Cutoff frequency (Hz) - Starting point
 nyquist = fs / 2;       % Nyquist frequency (5 Hz)
 Wn = fc / nyquist; 
 
@@ -30,16 +30,42 @@ sys = iddata(y_filt, u, Ts);
 est = syse;
 
 u_norm = (1 * (est.InputData - min(est.InputData)) / (max(est.InputData) - min(est.InputData)));
-y_norm = (1 * (est.OutputData - min(est.OutputData)) / (max(est.OutputData) - min(est.OutputData)));
+% y_norm = (1 * (est.OutputData - min(est.OutputData)) / (max(est.OutputData) - min(est.OutputData)));
 
-sysee = iddata(y_norm, u_norm, Ts);
+% remove means on u_norm
+y = est.OutputData * 0.13;
+% u = est.InputData
 
+
+G = load("thrust_tf.mat").thrust_tf;
+t = (0:length(u_norm)-1) / fs;
+% subtract the response to isolate the unmodelled inertia term
+step_resp = (0.191 + (0.314-0.191)*lsim(G, u_norm, t));
+% shift step_resp back 0.15 seconds
+step_resp_shifted = circshift(step_resp, round(-0.1 * fs)); % Shift step response by 0.15 seconds
+y_unmodelled = y - step_resp_shifted;
+u_der = gradient(step_resp_shifted, 0.01);
+t_u = (0:length(u_new)-1) / fs;
+plot(t, y)
+hold on;
+% plot(t_u, u_der)
+% plot(t_u, y_unmodelled)
+% %plot(t_u, step_resp_shifted)
+
+hold off;
+figure
+plot(u_new, y_unmodelled)
+
+sysee = iddata(y_unmodelled, u, Ts);
+legend()
 est = sysv;
 
 u_norm = (1 * (est.InputData - min(est.InputData)) / (max(est.InputData) - min(est.InputData)));
 y_norm = (1 * (est.OutputData - min(est.OutputData)) / (max(est.OutputData) - min(est.OutputData)));
 
-sysvv = iddata(y_norm, u_norm, Ts);
+t = (0:length(u_norm)-1) / fs;
+y_unmodelled_v = y_norm - lsim(G, u_norm, t);
+sysvv = iddata(y_unmodelled_v, u_norm, Ts);
 
 %% save
 thrust_tf = tf16;
