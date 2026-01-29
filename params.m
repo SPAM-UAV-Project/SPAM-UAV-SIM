@@ -1,5 +1,5 @@
 % scalar constants
-mass = 0.7; % kg
+mass = 0.631; % kg
 
 % define body frame as FRD front right down
 % define inertial frame as NED north east down
@@ -16,10 +16,10 @@ thrust_coeff_top = 10.9837; % N / norm throttle^2
 thrust_coeff_bot = 9.3460; % N / norm throttle^2
 
 % mav vars
-mav_inertia = eye(3) * 0.003;
-mav_inertia(3, 3) = 0.0007494 * 7/4;
+mav_inertia = eye(3) * 0.004013;
+mav_inertia(3, 3) = 0.0007873;
 mav_mass = 0.6; %kg
-top_motor_arm = [0, 0, 0.08]; % m from center of mass
+top_motor_arm = [0, 0, 0.18]; % m from center of mass
 f_xy_tf = load("f_xy_tf.mat").tf_force_y;
 thrust_tf = load("thrust_tf.mat").thrust_tf;
 
@@ -27,8 +27,8 @@ thrust_tf = load("thrust_tf.mat").thrust_tf;
 att_ctrl_time = 1/250; % 4 ms
 rate_ctrl_time = 1/1000; % 1 ms 
 
-mav_inertia_ctrl = eye(3) * 0.003;
-mav_inertia_ctrl(3, 3) = 0.0007494 * 7/4
+mav_inertia_ctrl = eye(3) * 0.004013;
+mav_inertia_ctrl(3, 3) = 0.0007873;
 torque_coeff_thrust_top = 0.0187; % Nm / Force for control allocator
 torque_coeff_thrust_bot = 0.0155;
 
@@ -57,4 +57,4 @@ control_allocator_matrix = inv(control_effectiveness_matrix)
 sample_time = 0.001; % s -> 1000 hz
 
 % initial conds
-initial_euler = [0, 0, 0];
+initial_euler = [0, 0.2, 0];
