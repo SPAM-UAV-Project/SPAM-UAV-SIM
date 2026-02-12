@@ -70,3 +70,11 @@ sysvv = iddata(y_unmodelled_v, u_norm, Ts);
 %% save
 thrust_tf = tf16;
 save("thrust_tf.mat", "thrust_tf");
+
+%% modify thrust_tf
+thrust_tf = load("thrust_tf.mat").thrust_tf;
+
+num_0 = thrust_tf.Numerator(2)
+den_0 = thrust_tf.Denominator(3)
+thrust_tf.numerator = thrust_tf.numerator * (den_0 / num_0)
+save("thrust_tf.mat", "thrust_tf");
