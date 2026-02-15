@@ -8,9 +8,9 @@ phase_lag = 0; % rad    (0 for now since control mixing in sim does not account 
 
 % prop model vars
 torque_coeff_top = 0.2551; % Nm / norm throttle: this is for the control allocator
-torque_coeff_bot = 0.1455;
+torque_coeff_bot = 0.1255;
 thrust_coeff_top = 15.3261; % N / norm throttle^2
-thrust_coeff_bot = 9.3460; % N / norm throttle^2
+thrust_coeff_bot = 9.3460-1; % N / norm throttle^2
 
 % mav vars
 mav_inertia = eye(3) * 0.004013;
@@ -19,6 +19,11 @@ mav_mass = 0.651; %kg
 top_motor_arm = [0, 0, 0.18]; % m from center of mass
 f_xy_tf = load("f_xy_tf.mat").tf_force_y;
 thrust_tf = load("thrust_tf.mat").thrust_tf;
+
+bx_offset = 0 * (pi/180); % rad
+by_offset = 0 * (pi/180); % rad
+initial_euler = [0, 0, 0];
+initial_pqr = [0.1,0.1 ,0.1];
 
 % controller vars
 att_ctrl_time = 1/250; % 4 ms
@@ -52,10 +57,6 @@ control_allocator_matrix = inv(control_effectiveness_matrix)
 
 % sim vars
 sample_time = 0.001; % s -> 1000 hz
-
-% initial conds
-initial_euler = [0, 0.2, 0];
-
 
 %% test
 % format long g
